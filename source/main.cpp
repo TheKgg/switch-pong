@@ -3,10 +3,6 @@
 #include <cstdlib>
 
 #include <switch.h>
-/*
-draws a rectangle. 
-x, y, width, height, framebuf, maxwidth
-*/
 void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth);
 void clearScreen(u32* framebuf, u32 maxwidth, u32 maxheight);
 int main(int argc, char *argv[]) {
@@ -45,13 +41,13 @@ int main(int argc, char *argv[]) {
 		//player 1
 		JoystickPosition p1joy;
 		hidJoystickRead(&p1joy, CONTROLLER_P1_AUTO, JOYSTICK_LEFT);
-        if(p1joy.dy>77) { //move up
+        if(p1joy.dy>400) { //move up
         	if(p1-80<5) {
         		p1=80;
         	} else {
         		p1-=5;
         	}
-        } else if(p1joy.dy<0) { //move down
+        } else if(p1joy.dy<-400) { //move down
         	if(p1+80>=height) {
         		p1=height-80;
         	} else {
