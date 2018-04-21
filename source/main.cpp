@@ -1,6 +1,5 @@
 #include <string.h>
 #include <stdio.h>
-#include <cstdlib>
 
 #include <switch.h>
 void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth);
