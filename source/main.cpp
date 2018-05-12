@@ -2,8 +2,9 @@
 #include <stdio.h>
 
 #include <switch.h>
-void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth);
+void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth, u32 maxheight);
 void clearScreen(u32* framebuf, u32 maxwidth, u32 maxheight);
+int move(int joyStick, int player, int height);
 int main(int argc, char *argv[]) {
 	gfxInitDefault();
 
@@ -21,7 +22,7 @@ int main(int argc, char *argv[]) {
 	u32 by = height/2;
 	
 	//ball momentum
-	u32 bmx=-5;
+	u32 bmx=-10;
 	u32 bmy=1;
 
 
@@ -40,39 +41,19 @@ int main(int argc, char *argv[]) {
 		//player 1
 		JoystickPosition p1joy;
 		hidJoystickRead(&p1joy, CONTROLLER_P1_AUTO, JOYSTICK_LEFT);
-        if(p1joy.dy>400) { //move up
-        	if(p1-80<5) {
-        		p1=80;
-        	} else {
-        		p1-=5;
-        	}
-        } else if(p1joy.dy<-400) { //move down
-        	if(p1+80>=height) {
-        		p1=height-80;
-        	} else {
-        		p1+=5;
-        	}
-        } 
-        drawRect(20, p1-75, 15, 150, framebuf, width);
+       	
+       	p1=move(p1joy.dy, p1, height);
+
+        drawRect(20, p1-50, 15, 100, framebuf, width, height);
 
 
 		//player 2
         JoystickPosition p2joy;
         hidJoystickRead(&p2joy, CONTROLLER_PLAYER_2, JOYSTICK_LEFT);
-        if(p2joy.dy>400) { //move up
-        	if(p2-80<5) {
-        		p2=80;
-        	} else {
-        		p2-=5;
-        	}
-        } else if(p2joy.dy<-400) { //move down
-        	if(p2+80>=height) {
-        		p2=height-80;
-        	} else {
-        		p2+=5;
-        	}
-        } 
-		drawRect(width-40, p2-75, 15, 150, framebuf, width);
+        
+        p2=move(p2joy.dy, p2, height);
+
+		drawRect(width-40, p2-50, 15, 100, framebuf, width, height);
 
 		//ball
         bx+=bmx;
@@ -89,15 +70,15 @@ int main(int argc, char *argv[]) {
 			p1score+=1;
 		}
 		//collision
-		if(by<5) {
-			by=5;
+		if(by<12) {
+			by=12;
 			bmy=-bmy;
-		} else if(by>=height-5) {
-			by=height-5;
+		} else if(by>=height-13) {
+			by=height-12;
 			bmy=-bmy;
 		}
 		if(bx<35 && bx>20) {
-			if(by>p1-75 && by<p1+75) {
+			if(by>p1-60 && by<p1+60) {
 				bmx=-bmx;
 				if(p1joy.dy>100) {
 					if(bmy<5)
@@ -112,7 +93,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if(bx>width-55 && bx<width-20) {
-			if(by>p2-75 && by<p2+75) {
+			if(by>p2-60 && by<p2+60) {
 				if(p2joy.dy>100) {
 					bmy-=1;
 				} else if(p2joy.dy<-100) {
@@ -122,75 +103,75 @@ int main(int argc, char *argv[]) {
 				bx=width-55;
 			}
 		}
-		drawRect(bx-5, by-5, 10, 10, framebuf, width);
+		drawRect(bx-10, by-10, 20, 20, framebuf, width, height);
 
 
 		//score
 		switch(p1score) {//ugg
 			case 0:
-			drawRect(width/2-100, height-100, 10, 50, framebuf, width);
-			drawRect(width/2-70, height-100, 10, 50, framebuf, width);
-			drawRect(width/2-90, height-100, 30, 10, framebuf, width);
-			drawRect(width/2-90, height-60, 30, 10, framebuf, width);
+			drawRect(width/2-100, height-100, 10, 50, framebuf, width, height);
+			drawRect(width/2-70, height-100, 10, 50, framebuf, width, height);
+			drawRect(width/2-90, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2-90, height-60, 30, 10, framebuf, width, height);
 			break;
 			case 1:
-			drawRect(width/2-80, height-100, 10, 50, framebuf, width);
+			drawRect(width/2-80, height-100, 10, 50, framebuf, width, height);
 			break;
 			case 2:
-			drawRect(width/2-100, height-100, 30, 10, framebuf, width);
-			drawRect(width/2-100, height-80, 30, 10, framebuf, width);
-			drawRect(width/2-100, height-60, 30, 10, framebuf, width);
+			drawRect(width/2-100, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2-100, height-80, 30, 10, framebuf, width, height);
+			drawRect(width/2-100, height-60, 30, 10, framebuf, width, height);
 
-			drawRect(width/2-80, height-90, 10, 10, framebuf, width);
-			drawRect(width/2-100, height-70, 10, 10, framebuf, width);
+			drawRect(width/2-80, height-90, 10, 10, framebuf, width, height);
+			drawRect(width/2-100, height-70, 10, 10, framebuf, width, height);
 			break;
 			case 3:
-			drawRect(width/2-100, height-100, 30, 10, framebuf, width);
-			drawRect(width/2-100, height-80, 30, 10, framebuf, width);
-			drawRect(width/2-100, height-60, 30, 10, framebuf, width);
+			drawRect(width/2-100, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2-100, height-80, 30, 10, framebuf, width, height);
+			drawRect(width/2-100, height-60, 30, 10, framebuf, width, height);
 
-			drawRect(width/2-80, height-90, 10, 10, framebuf, width);
-			drawRect(width/2-80, height-70, 10, 10, framebuf, width);
+			drawRect(width/2-80, height-90, 10, 10, framebuf, width, height);
+			drawRect(width/2-80, height-70, 10, 10, framebuf, width, height);
 			break;
 			case 4:
-			drawRect(width/2-100, height-100, 10, 20, framebuf, width);
-			drawRect(width/2-100, height-80, 20, 10, framebuf, width);
+			drawRect(width/2-100, height-100, 10, 20, framebuf, width, height);
+			drawRect(width/2-100, height-80, 20, 10, framebuf, width, height);
 
-			drawRect(width/2-80, height-100, 10, 50, framebuf, width);
+			drawRect(width/2-80, height-100, 10, 50, framebuf, width, height);
 			break;
 		}
-		drawRect(width/2-10, height-80, 20, 10, framebuf, width);
+		drawRect(width/2-10, height-80, 20, 10, framebuf, width, height);
 		switch(p2score) {//ugg
 			case 0:
-			drawRect(width/2+100, height-100, 10, 50, framebuf, width);
-			drawRect(width/2+70, height-100, 10, 50, framebuf, width);
-			drawRect(width/2+80, height-100, 30, 10, framebuf, width);
-			drawRect(width/2+80, height-60, 30, 10, framebuf, width);
+			drawRect(width/2+100, height-100, 10, 50, framebuf, width, height);
+			drawRect(width/2+70, height-100, 10, 50, framebuf, width, height);
+			drawRect(width/2+80, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2+80, height-60, 30, 10, framebuf, width, height);
 			break;
 			case 1:
-			drawRect(width/2+80, height-100, 10, 50, framebuf, width);
+			drawRect(width/2+80, height-100, 10, 50, framebuf, width, height);
 			break;
 			case 2:
-			drawRect(width/2+80, height-100, 30, 10, framebuf, width);
-			drawRect(width/2+80, height-80, 30, 10, framebuf, width);
-			drawRect(width/2+80, height-60, 30, 10, framebuf, width);
+			drawRect(width/2+80, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2+80, height-80, 30, 10, framebuf, width, height);
+			drawRect(width/2+80, height-60, 30, 10, framebuf, width, height);
 
-			drawRect(width/2+100, height-90, 10, 10, framebuf, width);
-			drawRect(width/2+80, height-70, 10, 10, framebuf, width);
+			drawRect(width/2+100, height-90, 10, 10, framebuf, width, height);
+			drawRect(width/2+80, height-70, 10, 10, framebuf, width, height);
 			break;
 			case 3:
-			drawRect(width/2+80, height-100, 30, 10, framebuf, width);
-			drawRect(width/2+80, height-80, 30, 10, framebuf, width);
-			drawRect(width/2+80, height-60, 30, 10, framebuf, width);
+			drawRect(width/2+80, height-100, 30, 10, framebuf, width, height);
+			drawRect(width/2+80, height-80, 30, 10, framebuf, width, height);
+			drawRect(width/2+80, height-60, 30, 10, framebuf, width, height);
 
-			drawRect(width/2+100, height-90, 10, 10, framebuf, width);
-			drawRect(width/2+100, height-70, 10, 10, framebuf, width);
+			drawRect(width/2+100, height-90, 10, 10, framebuf, width, height);
+			drawRect(width/2+100, height-70, 10, 10, framebuf, width, height);
 			break;
 			case 4:
-			drawRect(width/2+80, height-100, 10, 20, framebuf, width);
-			drawRect(width/2+80, height-80, 20, 10, framebuf, width);
+			drawRect(width/2+80, height-100, 10, 20, framebuf, width, height);
+			drawRect(width/2+80, height-80, 20, 10, framebuf, width, height);
 
-			drawRect(width/2+100, height-100, 10, 50, framebuf, width);
+			drawRect(width/2+100, height-100, 10, 50, framebuf, width, height);
 			break;
 		}
 		if(p2score>4 || p1score>4) 
@@ -202,19 +183,33 @@ int main(int argc, char *argv[]) {
 	gfxSwapBuffers();
 	gfxWaitForVsync();
 }
+clearScreen(framebuf, width, height);
+consoleInit(NULL);
+if(p2score>4)
+	printf("\nPlayer 2 wins!");
+else
+	printf("\nPlayer 1 wins!");
+printf("\n\n\nPress + to exit.");
+while(!(hidKeysDown(CONTROLLER_P1_AUTO) & KEY_PLUS)) {
+	hidScanInput(); 
+}
 
 
 gfxExit();
 return 0;
 }
-void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth) {
+void drawRect(u32 x, u32 y, u32 width, u32 height, u32* framebuf, u32 maxwidth, u32 maxheight) {
 	u32 pos;
 	u32 actualx = x+width;
 	u32 actualy = y+height;
 	u32 curX;
 	while(y<actualy) {
 		y++;
+		if(y>=maxheight)
+			break;
 		for(curX=x; curX<actualx; curX++){
+			if(x>=maxwidth)
+				break;
 			pos = y * maxwidth + curX;
 			framebuf[pos] = RGBA8_MAXALPHA(255,255,255);
 		}
@@ -227,4 +222,21 @@ void clearScreen(u32* framebuf, u32 maxwidth, u32 maxheight) {
 			framebuf[pos] = RGBA8_MAXALPHA(0,0,0);
 		}
 	}
+}
+int move(int joyStick, int player, int height) {
+	if(joyStick<400 && joyStick>-400) //deadzone
+		return player;
+	int mvmnt = joyStick/3000; //velocity
+	if(joyStick<0) { 
+		if(player+60>=height) 
+			player=height-60;
+		else
+			player-=mvmnt;
+	} else {
+		if(player-61<5) 
+			player=61;
+		else
+			player-=mvmnt;
+	}
+	return player;
 }
